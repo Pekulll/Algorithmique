@@ -4,10 +4,10 @@ import fr.main.algo.Utils;
 
 import java.util.Random;
 
-// Chemin de somme maximum dans un triangle
+// CHEMIN SOMME MAX DANS UN TRIANGLE
 public class CSM {
     public static void main(String[] args){
-        float[] D = CSM.run(1000, 1, 100);
+        float[] D = CSM.run(1000, 5000, 100);
         float average = 0, mediane = 0, variance = 0, ecart = 0;
         float max=-1, min=100;
 
