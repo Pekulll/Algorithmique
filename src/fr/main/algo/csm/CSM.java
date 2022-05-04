@@ -4,10 +4,10 @@ import fr.main.algo.Utils;
 
 import java.util.Random;
 
-// Chemin de somme maximum
+// Chemin de somme maximum dans un triangle
 public class CSM {
     public static void main(String[] args){
-        float[] D = CSM.run(1000, 5000, 100);
+        float[] D = CSM.run(1000, 1, 100);
         float average = 0, mediane = 0, variance = 0, ecart = 0;
         float max=-1, min=100;
 
@@ -34,7 +34,7 @@ public class CSM {
         System.out.println("Variance : " + variance);
         System.out.println("Ecart-type : " + ecart);
 
-        Utils.save("CSM", D, new float[]{average, mediane, variance, ecart});
+        //Utils.save("CSM", D, new float[]{average, mediane, variance, ecart});
     }
 
     public static float[] run(int Lmax, int Nruns, int Vmax){
@@ -44,11 +44,11 @@ public class CSM {
         for(int r = 0; r < Nruns; r++){
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
             int[] T = CSM.createTriangle(rand, rand.nextInt(Lmax) + 1, Vmax);
-            int[][] M = CSM.calculerM(T);
-            int v = CSM.getSum(T, M[0]);
+            int[] M = CSM.calculerM(T);
+            int v = M[0];
             System.out.println("Sum of the way: " + v);
             int g = glouton(T, 0);
-            // CMS.ascm(M, T, 0, T.length);
+            CSM.acsm(M, T, 0, T.length);
             if(v != 0) D[r] = (v-g) / (float)v;
             else D[r] = 0;
             System.out.println("");
@@ -91,27 +91,20 @@ public class CSM {
         return sum;
     }
 
-    public static int[][] calculerM(int[] T){
-        int[][] M = new int[T.length][];
+    public static int[] calculerM(int[] T){
+        int[] M = new int[T.length];
         int i = T.length - 1;
 
         while(i >= 0){
             int left = g(i);
 
             if(left >= T.length){
-                M[i] = new int[] {i};
+                M[i] = T[i];
             }else{
-                int[] correctWay;
-                int[] leftWay = M[left];
-                int[] rightWay = M[left + 1];
-
-                if(getSum(T, leftWay) >= getSum(T, rightWay)){
-                    correctWay = Utils.copyAndAdd(leftWay, i);
-                }else{
-                    correctWay = Utils.copyAndAdd(rightWay, i);
-                }
-
-                M[i] = Utils.copy(correctWay);
+                if(M[left] > M[left + 1])
+                    M[i] = M[left] + T[i];
+                else
+                    M[i] = M[left + 1] + T[i];
             }
 
             i--;
@@ -121,39 +114,15 @@ public class CSM {
         return M;
     }
 
-    public static void acsm(int[][] M, int[] T, int i, int n){
-        int[] way = M[i];
+    public static void acsm(int[] M, int[] T, int i, int n){
+        if(i >= n) return;
+        System.out.printf("T[%d]=%d\n", i, T[i]);
 
-        if(way == null || way.length == 0){
-            return;
-        }
+        int left = g(i);
 
-        int level = (int)((Math.sqrt(1 + 8 * (n-1)) - 1) / 2f);
-        int line = 1, inline = 0;
-
-        for(int x = 0; x < (int)((level * 3 + 4) / 2); x++){
-            System.out.print(" ");
-        }
-
-        for(int x = 0; x < n; x++){
-            inline += 1;
-
-            if(!Utils.contains(way, x)) {
-                System.out.print(" " + T[x] + "  ");
-            }else{
-                System.out.print("\u001B[32m" + T[x] + "\u001B[0m ");
-            }
-
-            if(inline >= line){
-                line++;
-                inline = 0;
-
-                System.out.println("");
-                for(int c = 0; c < (int)(((level - line) * 3) / 2); c++){
-                    System.out.print(" ");
-                }
-            }
-        }
+        if(M[left] > M[left + 1])
+            acsm(M, T, left, n);
+        else acsm(M, T, left + 1, n);
     }
 
     public static int glouton(int[] T, int i){
