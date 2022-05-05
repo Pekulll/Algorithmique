@@ -71,11 +71,47 @@ public class CPR {
     public static int[][] calculerM(int[][] S){
         int[][] M = new int[S.length][S[0].length];
 
+        for(int i = 0; i < S.length; i++){
+            M[i][M[0].length - 1] = S[i][S[0].length - 1];
+        }
+
+        for(int y = S[0].length - 2; y >= 0; y--){
+            for(int x = S.length - 1; x >= 0; x--){
+                if(x == S.length - 1) { // Start
+                    M[x][y] = S[x][y+1];
+                    continue;
+                }
+
+                if(M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1]){ // Best : East
+                    M[x][y] = M[x + 1][y] + S[x][y];
+                } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){ // Best : NE
+                    M[x][y] = M[x + 1][y + 1] + S[x][y];
+                } else if(M[x][y + 1] <= M[x + 1][y] && M[x][y + 1] <= M[x + 1][y + 1]){ // Best : North
+                    M[x][y] = M[x][y + 1] + S[x][y];
+                }
+            }
+        }
+
         return M;
     }
 
     public static void acpr(int[][] M, int[][] S, int x, int y){
         if(x >= S.length || y >= S[0].length) return;
+
+        int bx=0, by=0;
+
+        if(M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1]){
+            bx = x + 1;
+            by = y;
+        } else if(M[x][y + 1] <= M[x + 1][y + 1] && M[x][y + 1] <= M[x + 1][y]){
+            bx = x;
+            by = y + 1;
+        } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){
+            bx = x + 1;
+            by = y + 1;
+        }
+
+        System.out.printf("M(%d,%d)=%d", bx, by, M[bx][by]);
     }
 
     public static int glouton(int[][] S, int x, int y){
