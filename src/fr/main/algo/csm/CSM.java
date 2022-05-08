@@ -34,7 +34,7 @@ public class CSM {
         System.out.println("Variance : " + variance);
         System.out.println("Ecart-type : " + ecart);
 
-        //Utils.save("CSM", D, new float[]{average, mediane, variance, ecart});
+        Utils.save("CSM", D, new float[]{average, mediane, variance, ecart});
     }
 
     public static float[] run(int Lmax, int Nruns, int Vmax){
@@ -48,7 +48,7 @@ public class CSM {
             int v = M[0];
             System.out.println("Sum of the way: " + v);
             int g = glouton(T, 0);
-            CSM.acsm(M, T, 0, T.length);
+            //CSM.acsm(M, T, 0, T.length);
             if(v != 0) D[r] = (v-g) / (float)v;
             else D[r] = 0;
             System.out.println("");
@@ -116,13 +116,19 @@ public class CSM {
 
     public static void acsm(int[] M, int[] T, int i, int n){
         if(i >= n) return;
-        System.out.printf("T[%d]=%d\n", i, T[i]);
+        System.out.printf("T[%d]=%d  //  M[%d]=%d\n", i, T[i], i, M[i]);
 
         int left = g(i);
 
+        if(left + 1 >= n){
+            acsm(M, T, left + 1, n);
+            return;
+        }
+
         if(M[left] > M[left + 1])
             acsm(M, T, left, n);
-        else acsm(M, T, left + 1, n);
+        else
+            acsm(M, T, left + 1, n);
     }
 
     public static int glouton(int[] T, int i){

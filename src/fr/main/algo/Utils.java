@@ -39,7 +39,7 @@ public class Utils {
                 FileWriter myWriter = new FileWriter(filename + ".csv");
                 myWriter.write("DATA\n");
                 myWriter.write(Utils.tabToString(D));
-                myWriter.write("\n" + Utils.tabToString(results));
+                myWriter.write("\nResults\n" + Utils.tabToString(results));
                 myWriter.close();
                 System.out.println("Successfully wrote to the file.");
             } catch (IOException e) {
@@ -55,7 +55,7 @@ public class Utils {
     public static String tabToString(float[] tab){
         String r = "";
         for(float x : tab){
-            r += "" + x + "\n";
+            r += ("" + x + "\n").replace(".", ",");
         }
         return r;
     }

@@ -48,7 +48,7 @@ public class CPR {
             int v = M[0][0];
             System.out.println("Sum of the way: " + v);
             int g = glouton(S, 0, 0);
-            CPR.acpr(M, S, 0, 0);
+            //CPR.acpr(M, S, 0, 0);
             if(v != 0) D[r] = (v-g) / (float)v;
             else D[r] = 0;
             System.out.println("");
@@ -65,24 +65,29 @@ public class CPR {
                 T[i][j] = rand.nextInt(maxValue + 1);
         }
 
+        System.out.println("Square (l=" + l + ", c=" + c + ") created!");
         return T;
     }
 
     public static int[][] calculerM(int[][] S){
         int[][] M = new int[S.length][S[0].length];
+        M[M.length - 1][M[0].length - 1] = S[S.length - 1][S[0].length - 1];
 
-        for(int i = 0; i < S.length; i++){
-            M[i][M[0].length - 1] = S[i][S[0].length - 1];
-        }
-
-        for(int y = S[0].length - 2; y >= 0; y--){
+        for(int y = S[0].length - 1; y >= 0; y--){
             for(int x = S.length - 1; x >= 0; x--){
                 if(x == S.length - 1) { // Start
-                    M[x][y] = S[x][y+1];
+                    if(y == S[0].length - 1) continue;
+
+                    M[x][y] = M[x][y+1] + S[x][y+1];
                     continue;
                 }
 
-                if(M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1]){ // Best : East
+                if(y == S[0].length - 1){
+                    M[x][y] = M[x + 1][y] + S[x][y];
+                    continue;
+                }
+
+                if((M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1])){ // Best : East
                     M[x][y] = M[x + 1][y] + S[x][y];
                 } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){ // Best : NE
                     M[x][y] = M[x + 1][y + 1] + S[x][y];
@@ -96,22 +101,19 @@ public class CPR {
     }
 
     public static void acpr(int[][] M, int[][] S, int x, int y){
-        if(x >= S.length || y >= S[0].length) return;
+        if(x >= M.length || y >= M[0].length) return;
 
-        int bx=0, by=0;
+        System.out.printf("S(%d,%d)=%d  //  M(%d,%d)=%d\n", x, y, S[x][y], x, y, M[x][y]);
+
+        if(x + 1 >= M.length || y + 1 >= M[0].length) return;
 
         if(M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1]){
-            bx = x + 1;
-            by = y;
+            acpr(M, S, x+1, y);
         } else if(M[x][y + 1] <= M[x + 1][y + 1] && M[x][y + 1] <= M[x + 1][y]){
-            bx = x;
-            by = y + 1;
+            acpr(M, S, x, y+1);
         } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){
-            bx = x + 1;
-            by = y + 1;
+            acpr(M, S, x+1, y+1);
         }
-
-        System.out.printf("M(%d,%d)=%d", bx, by, M[bx][by]);
     }
 
     public static int glouton(int[][] S, int x, int y){

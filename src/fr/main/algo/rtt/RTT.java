@@ -41,10 +41,13 @@ public class RTT {
     public static float[] run(int Lmax, int Hmax, int Nruns){
         float[] D = new float[Nruns];
 
-        for (int r = 0; r < Nruns + 1; r++){ // r = nombre de runs
+        for (int r = 0; r < Nruns; r++){ // r = nombre de runs
+            System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
             int[][] E = estimate(Lmax, Hmax); // notes aléatoires, croissantes selon Hmax
             int[][][] MA = calculerMA(E);
             int[][] M = MA[0], A = MA[1];
+
+            aro(A, E, Lmax, Hmax);
 
             float g = glouton(E, Hmax) / (float)Lmax;
             float maxAverage = (float)M[Lmax][Hmax] / Lmax;
@@ -53,9 +56,7 @@ public class RTT {
             else D[r] = 0;
 
             String averageStr = String.format("%.2f", maxAverage);
-            System.out.printf("Max average : %s/20\n", averageStr);
-            System.out.println("Optimum :");
-            aro(A, E, Lmax, Hmax);
+            System.out.printf("Average of the optimum way: %s/20\n", averageStr);
 
             if (M[Lmax][Hmax] == 20 * Lmax){
                 System.out.println("\n === Useless to work anymore ===");
@@ -84,6 +85,7 @@ public class RTT {
             remaining -= hoursNeeded;
         }
 
+        System.out.println("Glouton average: " + (sum / (float)E.length) + "/20");
         return sum;
     }
 
