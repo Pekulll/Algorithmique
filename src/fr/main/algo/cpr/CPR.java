@@ -70,49 +70,78 @@ public class CPR {
     }
 
     public static int[][] calculerM(int[][] S){
+        int L = S.length, C = S[0].length;
         int[][] M = new int[S.length][S[0].length];
-        M[M.length - 1][M[0].length - 1] = S[S.length - 1][S[0].length - 1];
+        M[0][0] = 0;
 
-        for(int y = S[0].length - 1; y >= 0; y--){
-            for(int x = S.length - 1; x >= 0; x--){
-                if(x == S.length - 1) { // Start
-                    if(y == S[0].length - 1) continue;
+        for(int c=1; c < M[0].length; c++) M[0][c] = M[0][c-1] + E(0, c-1, C, L);
+        for(int l=1; l < M.length; l++) M[l][0] = M[l-1][0] + N(l-1, 0, C, L);
 
-                    M[x][y] = M[x][y+1] + S[x][y+1];
-                    continue;
-                }
-
-                if(y == S[0].length - 1){
-                    M[x][y] = M[x + 1][y] + S[x][y];
-                    continue;
-                }
-
-                if((M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1])){ // Best : East
-                    M[x][y] = M[x + 1][y] + S[x][y];
-                } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){ // Best : NE
-                    M[x][y] = M[x + 1][y + 1] + S[x][y];
-                } else if(M[x][y + 1] <= M[x + 1][y] && M[x][y + 1] <= M[x + 1][y + 1]){ // Best : North
-                    M[x][y] = M[x][y + 1] + S[x][y];
-                }
+        for(int l = 1; l < S[0].length; l--){
+            for(int c = 1; c < S.length; c--){
+                M[l][c] = min(
+                        M[l-1][c] + N(l-1, c, C, L),
+                        M[l-1][c-1] + E(l-1,c-1, C, L),
+                        M[l][c-1] + NE(l,c-1,C,L)
+                );
             }
         }
 
         return M;
+    } // Theta(L x C)
+
+    private static int E(int l, int c, int C, int L){
+        if(c == C -1) return 999999;
+        return 10;
     }
 
-    public static void acpr(int[][] M, int[][] S, int x, int y){
-        if(x >= M.length || y >= M[0].length) return;
+    private static int N(int l, int c, int C, int L){
+        if(l == L-1) return 999999;
+        return 5;
+    }
 
-        System.out.printf("S(%d,%d)=%d  //  M(%d,%d)=%d\n", x, y, S[x][y], x, y, M[x][y]);
+    private static int NE(int l, int c, int C, int L){
+        if(l == L-1 || c == C-1) return 999999;
+        return 5;
+    }
 
-        if(x + 1 >= M.length || y + 1 >= M[0].length) return;
+    private static int min(int x, int y, int z){
+        if(x <= y && x < z) return x;
+        if(y <= z) return y;
+        return z;
+    }
 
-        if(M[x + 1][y] <= M[x + 1][y + 1] && M[x + 1][y] <= M[x][y + 1]){
-            acpr(M, S, x+1, y);
-        } else if(M[x][y + 1] <= M[x + 1][y + 1] && M[x][y + 1] <= M[x + 1][y]){
-            acpr(M, S, x, y+1);
-        } else if(M[x + 1][y + 1] <= M[x + 1][y] && M[x + 1][y + 1] <= M[x][y + 1]){
-            acpr(M, S, x+1, y+1);
+    public static void acpr(int[][] M, int l, int c, int C, int L){
+        if(l == 0 || c == C) { System.out.print("0 "); return; }
+
+        if(l==0){
+            acpr(M, 0, c-1, C, L);
+            System.out.printf(" -- %d --> (%d,%d) ", E(0, c-1, C, L), l, c);
+            return;
+        }
+
+        if(c==0){
+            acpr(M, l-1, 0, C, L);
+            System.out.printf(" -- %d --> (%d,%d) ", E(l-1, 0, C, L), l, c);
+            return;
+        }
+
+        if(M[l][c] == M[l][c] + E(l,c-1,C,L)){
+            acpr(M, l, c-1, C, L);
+            System.out.printf(" -- %d --> (%d,%d) ", E(l, c-1, C, L), l, c);
+            return;
+        }
+
+        if(M[l][c] == M[l][c] + NE(l-1,c-1,C,L)){
+            acpr(M, l-1, c-1, C, L);
+            System.out.printf(" -- %d --> (%d,%d) ", NE(l-1, c-1, C, L), l, c);
+            return;
+        }
+
+        if(M[l][c] == M[l][c] + N(l-1,c,C,L)){
+            acpr(M, l-1, c, C, L);
+            System.out.printf(" -- %d --> (%d,%d) ", N(l-1, c, C, L), l, c);
+            return;
         }
     }
 
