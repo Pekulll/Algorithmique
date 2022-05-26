@@ -45,10 +45,10 @@ public class CPR {
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
             int[][] S = CPR.createSquare(rand, rand.nextInt(Lmax) + 1, rand.nextInt(Cmax) + 1, Vmax);
             int[][] M = CPR.calculerM(S);
-            int v = M[0][0];
+            int v = M[S.length - 1][S[0].length - 1];
             System.out.println("Sum of the way: " + v);
             int g = glouton(S, 0, 0);
-            //CPR.acpr(M, S, 0, 0);
+            //CPR.acpr(M, 0, 0, S[0].length, S.length, S);
             if(v != 0) D[r] = (v-g) / (float)v;
             else D[r] = 0;
             System.out.println("");
@@ -74,15 +74,15 @@ public class CPR {
         int[][] M = new int[S.length][S[0].length];
         M[0][0] = 0;
 
-        for(int c=1; c < M[0].length; c++) M[0][c] = M[0][c-1] + E(0, c-1, C, L);
-        for(int l=1; l < M.length; l++) M[l][0] = M[l-1][0] + N(l-1, 0, C, L);
+        for(int c=1; c < M[0].length; c++) M[0][c] = M[0][c-1] + E(0, c-1, C, L, S);
+        for(int l=1; l < M.length; l++) M[l][0] = M[l-1][0] + N(l-1, 0, C, L, S);
 
-        for(int l = 1; l < S[0].length; l--){
-            for(int c = 1; c < S.length; c--){
+        for(int l = 1; l < S.length; l++){
+            for(int c = 1; c < S[0].length; c++){
                 M[l][c] = min(
-                        M[l-1][c] + N(l-1, c, C, L),
-                        M[l-1][c-1] + E(l-1,c-1, C, L),
-                        M[l][c-1] + NE(l,c-1,C,L)
+                        M[l-1][c] + N(l-1, c, C, L, S),
+                        M[l-1][c-1] + E(l-1,c-1, C, L, S),
+                        M[l][c-1] + NE(l,c-1, C, L, S)
                 );
             }
         }
@@ -90,19 +90,19 @@ public class CPR {
         return M;
     } // Theta(L x C)
 
-    private static int E(int l, int c, int C, int L){
-        if(c == C -1) return 999999;
-        return 10;
+    private static int E(int l, int c, int C, int L, int[][] S){
+        if(c == C - 1) return 999999;
+        return S[l][c+1];
     }
 
-    private static int N(int l, int c, int C, int L){
-        if(l == L-1) return 999999;
-        return 5;
+    private static int N(int l, int c, int C, int L, int[][] S){
+        if(l == L - 1) return 999999;
+        return S[l + 1][c];
     }
 
-    private static int NE(int l, int c, int C, int L){
+    private static int NE(int l, int c, int C, int L, int[][] S){
         if(l == L-1 || c == C-1) return 999999;
-        return 5;
+        return S[l + 1][c + 1];
     }
 
     private static int min(int x, int y, int z){
@@ -111,36 +111,36 @@ public class CPR {
         return z;
     }
 
-    public static void acpr(int[][] M, int l, int c, int C, int L){
+    public static void acpr(int[][] M, int l, int c, int C, int L, int[][] S){
         if(l == 0 || c == C) { System.out.print("0 "); return; }
 
         if(l==0){
-            acpr(M, 0, c-1, C, L);
-            System.out.printf(" -- %d --> (%d,%d) ", E(0, c-1, C, L), l, c);
+            acpr(M, 0, c-1, C, L, S);
+            System.out.printf(" -- %d --> (%d,%d) ", E(0, c-1, C, L, S), l, c);
             return;
         }
 
         if(c==0){
-            acpr(M, l-1, 0, C, L);
-            System.out.printf(" -- %d --> (%d,%d) ", E(l-1, 0, C, L), l, c);
+            acpr(M, l-1, 0, C, L, S);
+            System.out.printf(" -- %d --> (%d,%d) ", E(l-1, 0, C, L, S), l, c);
             return;
         }
 
-        if(M[l][c] == M[l][c] + E(l,c-1,C,L)){
-            acpr(M, l, c-1, C, L);
-            System.out.printf(" -- %d --> (%d,%d) ", E(l, c-1, C, L), l, c);
+        if(M[l][c] == M[l][c] + E(l,c - 1, C, L, S)){
+            acpr(M, l, c-1, C, L, S);
+            System.out.printf(" -- %d --> (%d,%d) ", E(l, c-1, C, L, S), l, c);
             return;
         }
 
-        if(M[l][c] == M[l][c] + NE(l-1,c-1,C,L)){
-            acpr(M, l-1, c-1, C, L);
-            System.out.printf(" -- %d --> (%d,%d) ", NE(l-1, c-1, C, L), l, c);
+        if(M[l][c] == M[l][c] + NE(l - 1,c - 1, C, L, S)){
+            acpr(M, l - 1, c - 1, C, L, S);
+            System.out.printf(" -- %d --> (%d,%d) ", NE(l - 1, c - 1, C, L, S), l, c);
             return;
         }
 
-        if(M[l][c] == M[l][c] + N(l-1,c,C,L)){
-            acpr(M, l-1, c, C, L);
-            System.out.printf(" -- %d --> (%d,%d) ", N(l-1, c, C, L), l, c);
+        if(M[l][c] == M[l][c] + N(l - 1, c, C, L, S)){
+            acpr(M, l - 1, c, C, L, S);
+            System.out.printf(" -- %d --> (%d,%d) ", N(l-1, c, C, L, S), l, c);
             return;
         }
     }

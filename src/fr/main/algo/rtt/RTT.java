@@ -2,13 +2,12 @@ package fr.main.algo.rtt;
 
 import fr.main.algo.Utils;
 
-import java.util.Arrays;
 import java.util.Random;
 
 // REPARTITION OPTIMALE TEMPS DE TRAVAIL
 public class RTT {
     public static void main(String[] args){
-        float[] D = RTT.run(15, 10, 5000);
+        float[] D = RTT.run(15, 30, 5000);
         float average = 0, mediane = 0, variance = 0, ecart = 0;
         float max=-1, min=100;
 
@@ -39,28 +38,25 @@ public class RTT {
     }
 
     public static float[] run(int Lmax, int Hmax, int Nruns){
+        Random rand = new Random();
         float[] D = new float[Nruns];
 
         for (int r = 0; r < Nruns; r++){ // r = nombre de runs
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
-            int[][] E = estimate(Lmax, Hmax); // notes aléatoires, croissantes selon Hmax
+            int[][] E = estimate(rand.nextInt(Lmax) + 1, rand.nextInt(Hmax)); // notes aléatoires, croissantes selon Hmax
             int[][][] MA = calculerMA(E);
             int[][] M = MA[0], A = MA[1];
 
-            aro(A, E, Lmax, Hmax);
+            //aro(A, E, Lmax, Hmax);
 
-            float g = glouton(E, Hmax) / (float)Lmax;
-            float maxAverage = (float)M[Lmax][Hmax] / Lmax;
+            float g = glouton(E, E[0].length) / (float)E.length;
+            float maxAverage = (float)M[E.length][E[0].length - 1] / E.length;
 
             if(maxAverage != 0) D[r] = (maxAverage-g) / maxAverage;
             else D[r] = 0;
 
             String averageStr = String.format("%.2f", maxAverage);
             System.out.printf("Average of the optimum way: %s/20\n", averageStr);
-
-            if (M[Lmax][Hmax] == 20 * Lmax){
-                System.out.println("\n === Useless to work anymore ===");
-            }
         }
 
         return D;
