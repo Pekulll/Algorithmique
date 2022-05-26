@@ -8,33 +8,7 @@ import java.util.Random;
 public class RTT {
     public static void main(String[] args){
         float[] D = RTT.run(15, 30, 5000);
-        float average = 0, mediane = 0, variance = 0, ecart = 0;
-        float max=-1, min=100;
-
-        for(float d : D){
-            average += d;
-
-            if(max < d) max = d;
-            if(min > d) min = d;
-        }
-
-        mediane = (max - min) / 2;
-        average /= D.length;
-
-        for(float d : D){
-            variance += Math.pow(d - average, 2);
-        }
-
-        variance /= D.length;
-        ecart = (float)Math.sqrt(variance);
-
-        System.out.println("= Results ==========");
-        System.out.println("Moyenne : " + average);
-        System.out.println("Mediane : " + mediane);
-        System.out.println("Variance : " + variance);
-        System.out.println("Ecart-type : " + ecart);
-
-        Utils.save("RTT", D, new float[]{average, mediane, variance, ecart});
+        Utils.save("RTT", D);
     }
 
     public static float[] run(int Lmax, int Hmax, int Nruns){
@@ -43,18 +17,30 @@ public class RTT {
 
         for (int r = 0; r < Nruns; r++){ // r = nombre de runs
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
-            int[][] E = estimate(rand.nextInt(Lmax) + 1, rand.nextInt(Hmax)); // notes aléatoires, croissantes selon Hmax
+
+            int L = rand.nextInt(Lmax) + 1;
+            int H = rand.nextInt(Hmax) + 1;
+
+            // Créer les notes de chaque matière en fonction des heures travaillées
+            int[][] E = estimate(L, H); // notes aléatoires, croissantes selon Hmax
+
+            // Calcul M et A en fonction de E
             int[][][] MA = calculerMA(E);
             int[][] M = MA[0], A = MA[1];
 
-            //aro(A, E, Lmax, Hmax);
+            // Affiche le chemin optimal
+            RTT.aro(A, E, Lmax, Hmax);
 
-            float g = glouton(E, E[0].length) / (float)E.length;
+            // Calcul la moyenne obtenue de façon gloutonne
+            float g = glouton(E, E[0].length);
+            // Calcul la moyenne obtenue de façon otpimale
             float maxAverage = (float)M[E.length][E[0].length - 1] / E.length;
 
+            // Calcul et ajoute la distance relative de cette run
             if(maxAverage != 0) D[r] = (maxAverage-g) / maxAverage;
             else D[r] = 0;
 
+            // Affiche la moyenne obtenue de manière optimale
             String averageStr = String.format("%.2f", maxAverage);
             System.out.printf("Average of the optimum way: %s/20\n", averageStr);
         }
@@ -62,12 +48,13 @@ public class RTT {
         return D;
     }
 
-    public static int glouton(int[][] E, int Hmax) {
+    public static float glouton(int[][] E, int Hmax) {
         int remaining = Hmax, sum = 0;
 
         for(int l = 0; l < E.length; l++){
-            int max = 0, hoursNeeded = 0;
+            int max = E[l][0], hoursNeeded = 0; // Récupère la note associé à 0 heure de travail
 
+            // Choisi la note maximale avec le nombre d'heure restant à disposition
             for(int h = 0; h < E[l].length; h++){
                 if(h > remaining) break;
 
@@ -77,13 +64,13 @@ public class RTT {
                 }
             }
 
-            sum += max;
-            remaining -= hoursNeeded;
+            sum += max; // Ajoute la note obtenu
+            remaining -= hoursNeeded; // Retranche les heures de travail utilisées
         }
 
         System.out.println("Glouton average: " + (sum / (float)E.length) + "/20");
-        return sum;
-    }
+        return sum / (float)E.length;
+    } // Theta (L * H)
 
     public static int[][][] calculerMA(int[][] E){	// E : tableau des notes estimées.
         // E[0:n][0:H+1] est de terme général E[i][h] = e(i,h).
@@ -109,6 +96,7 @@ public class RTT {
                 M[k][h] = -1;
                 for (int h_k = 0; h_k < h+1; h_k++){
                     int mkhh_k = M[k-1][h - h_k] + E[k-1][h_k];
+
                     if (mkhh_k > M[k][h]){
                         M[k][h] = mkhh_k;
                         A[k][h] = h_k;
@@ -118,7 +106,7 @@ public class RTT {
                 M[k][h] = M[k][h] - E[k-1][0];  // M[k][h] = m(k,h)
             }
         return new int[][][] {M, A};
-    } // complexité Theta(n x H^2).
+    } // complexité Theta(L x H^2).
 
     public static void aro(int[][] A, int[][] E, int k, int h){
         // affiche ro(k,h) : répartition optimale de h heures sur les k premières unités.

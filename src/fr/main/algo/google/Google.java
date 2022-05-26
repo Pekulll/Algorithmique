@@ -12,33 +12,7 @@ public class Google {
 
     public static void main(String[] args){
         float[] D = Google.run(1000, 5000, 1000000000);
-        float average = 0, mediane = 0, variance = 0, ecart = 0;
-        float max=-1, min=100;
-
-        for(float d : D){
-            average += d;
-
-            if(max < d) max = d;
-            if(min > d) min = d;
-        }
-
-        mediane = (max - min) / 2;
-        average /= D.length;
-
-        for(float d : D){
-            variance += Math.pow(d - average, 2);
-        }
-
-        variance /= D.length;
-        ecart = (float)Math.sqrt(variance);
-
-        System.out.println("= Results ==========");
-        System.out.println("Moyenne : " + average);
-        System.out.println("Mediane : " + mediane);
-        System.out.println("Variance : " + variance);
-        System.out.println("Ecart-type : " + ecart);
-
-        Utils.save("CSM", D, new float[]{average, mediane, variance, ecart});
+        Utils.save("CSM", D);
     }
 
     public static float[] run(int Lmax, int Nruns, int Vmax){

@@ -7,33 +7,7 @@ import java.util.Random;
 public class SSM {
     public static void main(String[] args){
         float[] D = SSM.run(100, 50, 100, 1000, 5000);
-        float average = 0, mediane = 0, variance = 0, ecart = 0;
-        float max=-1, min=100;
-
-        for(float d : D){
-            average += d;
-
-            if(max < d) max = d;
-            if(min > d) min = d;
-        }
-
-        mediane = (max - min) / 2;
-        average /= D.length;
-
-        for(float d : D){
-            variance += Math.pow(d - average, 2);
-        }
-
-        variance /= D.length;
-        ecart = (float)Math.sqrt(variance);
-
-        System.out.println("= Results ==========");
-        System.out.println("Moyenne : " + average);
-        System.out.println("Mediane : " + mediane);
-        System.out.println("Variance : " + variance);
-        System.out.println("Ecart-type : " + ecart);
-
-        Utils.save("SSM", D, new float[]{average, mediane, variance, ecart});
+        Utils.save("SSM", D);
     }
 
     public static float[] run(int n, int Tmax, int Vmax, int Cmax, int Nruns){
@@ -42,17 +16,30 @@ public class SSM {
 
         for (int r = 0; r < Nruns; r++){ // r = nombre de runs
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
-            int[] T = createSize(n, rand.nextInt(Tmax) + 1, rand); // tailles aléatoires (max=Tmax)
-            int[] V = createValues(n, rand.nextInt(Vmax) + 1, rand); // valeur aléatoires (max=Vmax)
+
+            int S = rand.nextInt(Tmax) + 1; // Taille max
+            int P = rand.nextInt(Vmax) + 1; // Valeur max
+
+            // Génère aléatoirement la taille des objets
+            int[] T = createSize(n, S, rand); // tailles aléatoires (max=S)
+            // Génère aléatoirement la valeur des objets
+            int[] V = createValues(n, P, rand); // valeur aléatoires (max=P)
+
+            // Génère aléatoirement la contenance du premier et du second sac
             int C1 = rand.nextInt(Cmax) + 1, C2 = rand.nextInt(Cmax) + 1;
+
+            // Calcul M en fonction de T, V, C1, et C2
             int[][][] M = calculerM(T, V, C1, C2);
 
+            // Calcul la valeur du chemin glouton
             int g = glouton(T, V, C1, C2, rand);
-            int v = M[T.length][C1][C2];
+            int v = M[n][C1][C2];
 
+            // Calcul et ajoute la distance relative de cette run
             if(v != 0) D[r] = (v - g) / (float)v;
             else D[r] = 0;
 
+            // Affiche la valeur du chemin optimal
             System.out.printf("Average of the optimum way: %d\n", v);
         }
 
@@ -80,7 +67,7 @@ public class SSM {
 
         System.out.printf("Glouton way: %d\n", g);
         return g;
-    }
+    } // Theta (n)
 
     public static int[] createSize(int n, int Tmax, Random rand){
         int[] T = new int[n];
@@ -90,7 +77,7 @@ public class SSM {
         }
 
         return T;
-    }
+    } // Theta (n)
 
     public static int[] createValues(int n, int Vmax, Random rand){
         int[] V = new int[n];
@@ -100,12 +87,13 @@ public class SSM {
         }
 
         return V;
-    }
+    } // Theta (n)
 
     public static int[][][] calculerM(int[] T, int[] V, int C1, int C2){
         int n = T.length;
         int[][][] M = new int[n + 1][C1 + 1][C2 + 1];
 
+        // Base : m(0, c1, c2) = 0
         for(int c1 = 0; c1 < C1 + 1; c1++){
             for(int c2 = 0; c2 < C2 + 1; c2++){
                 M[0][c1][c2] = 0;
@@ -131,7 +119,7 @@ public class SSM {
         }
 
         return M;
-    }
+    } // Theta (n * C1 * C2)
 
     private static int max(int x, int y, int z){
         if(x >= y && x >= z) return x;

@@ -7,33 +7,7 @@ import java.util.Random;
 public class RSE {
     public static void main(String[] args){
         float[] D = RSE.run(1000, 1000, 5000);
-        float average = 0, mediane = 0, variance = 0, ecart = 0;
-        float max=-1, min=100;
-
-        for(float d : D){
-            average += d;
-
-            if(max < d) max = d;
-            if(min > d) min = d;
-        }
-
-        mediane = (max - min) / 2;
-        average /= D.length;
-
-        for(float d : D){
-            variance += Math.pow(d - average, 2);
-        }
-
-        variance /= D.length;
-        ecart = (float)Math.sqrt(variance);
-
-        System.out.println("= Results ==========");
-        System.out.println("Moyenne : " + average);
-        System.out.println("Mediane : " + mediane);
-        System.out.println("Variance : " + variance);
-        System.out.println("Ecart-type : " + ecart);
-
-        Utils.save("RSE", D, new float[]{average, mediane, variance, ecart});
+        Utils.save("RSE", D);
     }
 
     public static float[] run(int Emax, int Smax, int Nruns){
@@ -43,26 +17,38 @@ public class RSE {
         for (int r = 0; r < Nruns; r++){ // r = nombre de runs
             System.out.println("= Run " + r + "/" + (Nruns-1) + " ==========");
 
-            int[][] G = estimate(rand, rand.nextInt(Emax) + 1, rand.nextInt(Smax) + 1); // gains aléatoires
+            int E = rand.nextInt(Emax) + 1;
+            int S = rand.nextInt(Smax) + 1;
+
+            // Créer les gains aléatoirement pour chaque entrepôt en fonction du stock
+            int[][] G = estimate(rand, E, S);
+
+            // Calcul M et A en fonction de G
             int[][][] MA = calculerMA(G);
             int[][] M = MA[0], A = MA[1];
 
+            // Calcul la valeur du chemin glouton
             int g = glouton(G);
-            int v = 0;
 
-            int s = G[0].length - 1;
-            for(int k = G.length; k > 0; k--){
+            // Récupération de la valeur du chemin optimal
+            int v = 0;
+            int s = S- 1;
+
+            for(int k = E; k > 0; k--){
                 int aks = A[k][s];
                 s -= aks;
                 v += G[k-1][aks];
             }
 
+            // Affiche le chemin optimal
+            RSE.aro(A, G, G.length, G[0].length - 1);
+
+            // Calcul et ajoute la distance relative de cette run
             if(v != 0) D[r] = (v-g) / (float)v;
             else D[r] = 0;
 
-            //aro(A, G, G.length, G[0].length - 1);
+            // Affiche la valeur du chemin optimal
             System.out.printf("Sum of the optimum way: %d\n", v);
-            System.out.printf("Stock max = %d\n", G[0].length - 1);
         }
 
         return D;
@@ -72,8 +58,9 @@ public class RSE {
         int remaining = G[0].length - 1, sum = 0;
 
         for(int l = 0; l < G.length; l++){
-            int max = G[l][0], stockNeeded = 0;
+            int max = G[l][0], stockNeeded = 0; // Récupère le gain associé à un stock nul
 
+            // Choisi le gain maximum avec le stock restant à disposition
             for(int s = 1; s < G[l].length; s++){
                 if(s > remaining) break;
 
@@ -83,14 +70,13 @@ public class RSE {
                 }
             }
 
-            sum += max;
-            remaining -= stockNeeded;
-            //System.out.printf("Entrepot %d : livré = %d, gain = %d\n", l, stockNeeded, max);
+            sum += max; // Ajoute le gain
+            remaining -= stockNeeded; // Retranche le stock associé au gain
         }
 
         System.out.println("Glouton: " + sum);
         return sum;
-    }
+    } // Theta (E * S)
 
     public static int[][][] calculerMA(int[][] G){	// G : tableau des gains estimés.
         int n = G.length, S = G[0].length - 1;
@@ -127,8 +113,11 @@ public class RSE {
     public static int[][] estimate(Random rand, int n, int S){ // retourne G[0:n][0:H+1] de terme général
         // G[i][h] = g(i,h). Les gains sont aléatoires, croissantes selon s.
         int[][] G = new int[n][S+1];
+
+        // Initialise les gains pour aucun stock
         for (int i = 0; i < n; i++) G[i][0] = rand.nextInt(10) - 3;
 
+        // Génère aléatoirement les gains pour des stock > 1, pour tous les entrepôts
         for (int i = 0; i < n; i++)
             for (int s = 1; s < S+1; s++)
                 G[i][s] = max(G[i][s-1] + rand.nextInt(10) - 3, 0);
