@@ -35,6 +35,8 @@ public class Utils {
 
         float[] results = new float[]{average, mediane, variance, ecart};
 
+        // Ecriture dans le CSV inspiré de
+        // https://www.delftstack.com/fr/howto/java/how-to-create-a-file-and-write-data-to-it-in-java/
         try {
             File myObj = new File(filename + ".csv");
             if (myObj.createNewFile()) {

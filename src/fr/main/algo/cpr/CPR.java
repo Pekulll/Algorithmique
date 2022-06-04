@@ -37,7 +37,7 @@ public class CPR {
             int g = glouton(N, E, NE, 0, 0);
 
             // Calcul et ajoute la distance relative de cette run à D
-            if(v != 0) D[r] = (v-g) / (float)v;
+            if(v != 0) D[r] = (g-v) / (float)v;
             else D[r] = 0;
         }
 
@@ -150,6 +150,8 @@ public class CPR {
             if(minimum == N(l, c, C, L, N)) l++; // Meilleure direction : Nord
             else if(minimum == E(l, c, C, L, E)) c++; // Meilleure direction : Est
             else { l++; c++; } // Meilleure direction : Nord-Est
+
+            g += minimum; // On ajoute le coût du déplacement que l'on vient d'effectuer
         }
 
         System.out.println("'Glouton' way is equal to " + g);
