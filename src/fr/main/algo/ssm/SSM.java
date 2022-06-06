@@ -32,11 +32,12 @@ public class SSM {
             int[][][] M = calculerM(T, V, C1, C2);
 
             // Calcul la valeur du chemin glouton
-            int g = glouton(T, V, C1, C2, rand);
+            int gd = gloutonDensite(T, V, C1, C2, rand);
+            int gv = gloutonValeur(T, V, C1, C2, rand);
             int v = M[n][C1][C2];
 
             // Calcul et ajoute la distance relative de cette run
-            if(v != 0) D[r] = (v - g) / (float)v;
+            if(v != 0) D[r] = (v - gv) / (float)v;
             else D[r] = 0;
 
             // Affiche la valeur du chemin optimal
@@ -46,11 +47,34 @@ public class SSM {
         return D;
     }
 
-    private static int glouton(int[] T, int[] V, int C1, int C2, Random rand) {
+    private static int gloutonDensite(int[] T, int[] V, int C1, int C2, Random rand) {
         int[] indices = new int[T.length];
         for(int i = 0; i < indices.length; i++) indices[i] = i;
         // Tri les indices de chaque objet en fonction de leur ratio valeur/taille dans l'ordre décroissant
-        Utils.qs(indices, T, V, 0, indices.length, rand);
+        Utils.qsRatio(indices, T, V, 0, indices.length, rand);
+
+        int c1 = C1, c2 = C2;
+        int g = 0;
+
+        for(int i = 0; i < indices.length; i++){
+            if(c1 >= T[indices[i]]){ // l'objet rentre dans le premier sac
+                c1 -= T[indices[i]]; // on retire la place que prend l'objet dans le sac 1
+                g += V[indices[i]];  // on ajoute la valeur de l'objet
+            } else if(c2 >= T[indices[i]]){ // l'objet rentre dans le second sac
+                c2 -= T[indices[i]];        // on retire la place que prend l'objet dans le sac 2
+                g += V[indices[i]];         // on ajoute la valeur de l'objet
+            }
+        }
+
+        System.out.printf("Glouton way: %d\n", g);
+        return g;
+    } // Theta (n)
+
+    private static int gloutonValeur(int[] T, int[] V, int C1, int C2, Random rand) {
+        int[] indices = new int[T.length];
+        for(int i = 0; i < indices.length; i++) indices[i] = i;
+        // Tri les indices de chaque objet en fonction de leur valeur dans l'ordre décroissant
+        Utils.qs(indices, V, 0, indices.length, rand);
 
         int c1 = C1, c2 = C2;
         int g = 0;

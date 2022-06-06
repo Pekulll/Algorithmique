@@ -70,21 +70,48 @@ public class Utils {
         return r;
     }
 
-    public static void qs(int[] tab, int[] T, int[] V, int i, int j, Random rand){
+    // Méthodes de Quick Sort issues du cours d'algorithmique de Mr. Natowicz
+
+    public static void qsRatio(int[] tab, int[] T, int[] V, int i, int j, Random rand){
         if (j-i <= 1) return ; // le sous-tableau T[i:j] est croissant
         // ici : j-i >= 2
-        int k = segmenter(tab, T, V, i, j, rand); // T[i:k] <= T[k] < T[k+1:j]    <<< (1)
-        qs(tab, T, V,i,k, rand);   // (1) et T[i:k] croissant
-        qs(tab, T, V,k+1,j, rand); // (1) et T[i:k] croissant et T[k+1:j] croissant, donc T[i:j] croissant
+        int k = segmenterRatio(tab, T, V, i, j, rand); // T[i:k] <= T[k] < T[k+1:j]    <<< (1)
+        qsRatio(tab, T, V,i,k, rand);   // (1) et T[i:k] croissant
+        qsRatio(tab, T, V,k+1,j, rand); // (1) et T[i:k] croissant et T[k+1:j] croissant, donc T[i:j] croissant
     }
 
-    public static int segmenter(int[] tab, int[] T, int[] V, int i, int j, Random rand){
+    public static int segmenterRatio(int[] tab, int[] T, int[] V, int i, int j, Random rand){
         int r = i + rand.nextInt(j-i);
         permuter(tab,i,r);
         int k = i, jp = k+1; // I(k,j')
 
         while (jp < j) // I(k,j') et jp < j
             if (V[k] / (float)T[k] >= V[jp] / (float)T[jp]) // I(k,j'+1)
+                jp++; // I(k,j')
+            else {
+                permuter(tab,jp,k+1);
+                permuter(tab,k,k+1); // I(k+1,j'+1)
+                k++; jp++; // I(k,jp)
+            }
+
+        return k;
+    }
+
+    public static void qs(int[] tab, int[] V, int i, int j, Random rand){
+        if (j-i <= 1) return ; // le sous-tableau T[i:j] est croissant
+        // ici : j-i >= 2
+        int k = segmenter(tab, V, i, j, rand); // T[i:k] <= T[k] < T[k+1:j]    <<< (1)
+        qs(tab, V,i,k, rand);   // (1) et T[i:k] croissant
+        qs(tab, V,k+1,j, rand); // (1) et T[i:k] croissant et T[k+1:j] croissant, donc T[i:j] croissant
+    }
+
+    public static int segmenter(int[] tab, int[] V, int i, int j, Random rand){
+        int r = i + rand.nextInt(j-i);
+        permuter(tab,i,r);
+        int k = i, jp = k+1; // I(k,j')
+
+        while (jp < j) // I(k,j') et jp < j
+            if (V[k] >= V[jp]) // I(k,j'+1)
                 jp++; // I(k,j')
             else {
                 permuter(tab,jp,k+1);

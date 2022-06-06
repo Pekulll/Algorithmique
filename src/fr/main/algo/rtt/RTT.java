@@ -29,7 +29,7 @@ public class RTT {
             int[][] M = MA[0], A = MA[1];
 
             // Affiche le chemin optimal
-            RTT.aro(A, E, Lmax, Hmax);
+            //RTT.aro(A, E, Lmax, Hmax);
 
             // Calcul la moyenne obtenue de façon gloutonne
             float g = glouton(E, E[0].length);
@@ -52,15 +52,19 @@ public class RTT {
         int remaining = Hmax, sum = 0;
 
         for(int l = 0; l < E.length; l++){
-            int max = E[l][0], hoursNeeded = 0; // Récupère la note associé à 0 heure de travail
+            int max = 0, hoursNeeded = 0; // Récupère la note associé à 0 heure de travail
 
-            // Choisi la note maximale avec le nombre d'heure restant à disposition
-            for(int h = 0; h < E[l].length; h++){
-                if(h > remaining) break;
+            if(remaining == 0){
+                max = E[l][0];
+            }else{
+                // Choisi la note maximale avec le nombre d'heure restant à disposition
+                for(int h = 1; h < E[l].length; h++){
+                    if(h > remaining) break;
 
-                if(max < E[l][h]){
-                    max = E[l][h];
-                    hoursNeeded = h;
+                    if(max < E[l][h] - E[l][h - 1]){ // e(l, h) - e(l, h - 1)
+                        max = E[l][h] - E[l][h - 1]; // Nouveau gain maximum
+                        hoursNeeded = h;
+                    }
                 }
             }
 
@@ -132,7 +136,7 @@ public class RTT {
         for (int i = 0; i < n; i++) E[i][0] = 6 + rand.nextInt(5);
         for (int i = 0; i < n; i++)
             for (int h = 1; h < H+1; h++)
-                E[i][h] = min( E[i][h-1] + (1+rand.nextInt(5)), 20) ;
+                E[i][h] = min( E[i][h-1] + ( 1 +rand.nextInt(5)), 20) ;
         return E;
     }
 
