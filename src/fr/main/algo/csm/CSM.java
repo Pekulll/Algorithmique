@@ -58,10 +58,16 @@ public class CSM {
 
         // Niveau de l'indice i
         // Utilise une équation du second degré pour trouvé le niveau de l'indice i sans boucle
-        int level = (int)((Math.sqrt(1 + 8 * i) - 1) / 2);
+        // int level = (int)((Math.sqrt(1 + 8 * i) - 1) / 2);
+
+        // Sans utiliser la méthode de calcul avec une équation du second degré
+        // On obtient la valeur de l grâce à une boucle while
+        int level = 1;
+        while((level * (level + 1) / 2) < i - level) level++;
 
         // Position de l'indice i dans le niveau 'level'
         int position = i - (level * (level + 1) / 2);
+        System.out.println("l:" + level + " // p:" + position);
 
         // Position du descendant gauche de i
         // level * (level + 1) / 2 = le nombre d'élément au niveau 'level'
@@ -69,6 +75,10 @@ public class CSM {
         // level * (level + 1) / 2f + position = l'indice du descendant gauche
         int left = (int)((level + 1) * (level + 2) / 2f + position);
         return left;
+    }
+
+    public static int d(int i){
+        return g(i) + 1;
     }
 
     public static int[] calculerM(int[] T){
