@@ -67,7 +67,6 @@ public class CSM {
 
         // Position de l'indice i dans le niveau 'level'
         int position = i - (level * (level + 1) / 2);
-        System.out.println("l:" + level + " // p:" + position);
 
         // Position du descendant gauche de i
         // level * (level + 1) / 2 = le nombre d'élément au niveau 'level'
