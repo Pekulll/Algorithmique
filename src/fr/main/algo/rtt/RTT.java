@@ -122,8 +122,7 @@ public class RTT {
         // ro(k,h) = ro(k-1,h-a(k,h)) union {"k-1 <-- a(k,h)"}
         int akh = A[k][h]; // nombre d'heures allouées à la k-ème unité dans ro(k,h)
         aro(A,E,k-1,h-akh); // ro(k-1,h-akh) a été affichée
-        System.out.printf("unité %d, <-- %d heures, note estimée %d\n",
-                k-1, akh, E[k-1][akh]);
+        System.out.printf("unité %d, <-- %d heures, note estimée %d\n", k-1, akh, E[k-1][akh]);
         // le nombre d'heures allouées à la kème unité a été affiché
         // Ainsi :
         // 1) La répartition optimale ro(k-1,h-akh) a été affichée,

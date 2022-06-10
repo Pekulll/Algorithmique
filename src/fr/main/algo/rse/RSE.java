@@ -23,6 +23,21 @@ public class RSE {
             // Créer les gains aléatoirement pour chaque entrepôt en fonction du stock
             int[][] G = estimate(rand, E, S);
 
+            /* VALEURS DE TESTS
+            int[][] G = new int[][] // g(k,s) = gain obtenu d'une livraison
+                    // d'une quantité de stock s à l'entrepôt k
+                    {    { 0, 5, 5, 7, 7,10,10,12,12,13,13}, //
+                            { 0, 8,10,10,10,12,12,14,14,14,14},
+                            {0,10,10,12,12,13,13,14,15,16,16},
+                            {0,14,14,14,16,16,16,16,16,16,16},
+                            {0,10,14,14,14,14,14,14,14,16,16},
+                            {0,10,12,12,16,16,16,16,16,16,16},
+                            {0,12,12,14,14,15,15,15,17,17,17}
+                    } ;
+
+            int S = G[0].length - 1;
+            int E = G.length;*/
+
             // Calcul M et A en fonction de G
             int[][][] MA = calculerMA(G);
             int[][] M = MA[0], A = MA[1];
@@ -31,14 +46,7 @@ public class RSE {
             int g = glouton(G);
 
             // Récupération de la valeur du chemin optimal
-            int v = 0;
-            int s = S- 1;
-
-            for(int k = E; k > 0; k--){
-                int aks = A[k][s];
-                s -= aks;
-                v += G[k-1][aks];
-            }
+            int v = M[E][S];
 
             // Affiche le chemin optimal
             RSE.aro(A, G, G.length, G[0].length - 1);
@@ -56,22 +64,29 @@ public class RSE {
 
     public static int glouton(int[][] G) {
         int remaining = G[0].length - 1, sum = 0;
+        int[] hoursAllocated = new int[G.length];
 
-        for(int l = 0; l < G.length; l++){
-            int max = G[l][0], stockNeeded = 0; // Récupère le gain associé à un stock nul
+        for(int e = 0; e < G.length; e++){
+            hoursAllocated[e] = 0;
+            sum += G[e][0];
+        }
 
-            // Choisi le gain maximum avec le stock restant à disposition
-            for(int s = 1; s < G[l].length; s++){
-                if(s > remaining) break;
+        while(remaining > 0){
+            int max = 0, allocatedTo = 0;
 
-                if(max < G[l][s]){
-                    max = G[l][s];
-                    stockNeeded = s;
+            for(int e = 0; e < G.length; e++){
+                // Le nombre de stock alloué à cet entrepôt est maximum
+                if(hoursAllocated[e] + 1 >= G[e].length) continue;
+
+                if(max < G[e][hoursAllocated[e] + 1] - G[e][hoursAllocated[e]]){ // g(l, h + 1) - g(l, h)
+                    max = G[e][hoursAllocated[e] + 1] - G[e][hoursAllocated[e]]; // Nouveau gain maximum
+                    allocatedTo = e;
                 }
             }
 
-            sum += max; // Ajoute le gain
-            remaining -= stockNeeded; // Retranche le stock associé au gain
+            sum += max; // On ajoute le gain max
+            hoursAllocated[allocatedTo]++; // On ajoute 1 au stock envoyé à l'entrepôt qui correspond au gain max
+            remaining--; // On enlève 1 au stock restant
         }
 
         System.out.println("Glouton: " + sum);
@@ -115,12 +130,12 @@ public class RSE {
         int[][] G = new int[n][S+1];
 
         // Initialise les gains pour aucun stock
-        for (int i = 0; i < n; i++) G[i][0] = rand.nextInt(10) - 3;
+        for (int i = 0; i < n; i++) G[i][0] = 0;
 
         // Génère aléatoirement les gains pour des stock > 1, pour tous les entrepôts
         for (int i = 0; i < n; i++)
             for (int s = 1; s < S+1; s++)
-                G[i][s] = max(G[i][s-1] + rand.nextInt(10) - 3, 0);
+                G[i][s] = max(G[i][s-1] + rand.nextInt(5), 0);
 
         return G;
     }
