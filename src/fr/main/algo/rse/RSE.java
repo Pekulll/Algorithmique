@@ -10,7 +10,7 @@ public class RSE {
         Utils.save("RSE", D);
     }
 
-    public static float[] run(int Emax, int Smax, int Nruns){
+    private static float[] run(int Emax, int Smax, int Nruns){
         Random rand = new Random();
         float[] D = new float[Nruns];
 
@@ -62,7 +62,7 @@ public class RSE {
         return D;
     }
 
-    public static int glouton(int[][] G) {
+    private static int glouton(int[][] G) {
         int remaining = G[0].length - 1, sum = 0;
         int[] hoursAllocated = new int[G.length];
 
@@ -93,7 +93,7 @@ public class RSE {
         return sum;
     } // Theta (E * S)
 
-    public static int[][][] calculerMA(int[][] G){	// G : tableau des gains estimés.
+    private static int[][][] calculerMA(int[][] G){	// G : tableau des gains estimés.
         int n = G.length, S = G[0].length - 1;
         int[][] M = new int[n + 1][S + 1], A = new int[n + 1][S + 1];
 
@@ -118,14 +118,14 @@ public class RSE {
         return new int[][][] {M, A};
     } // complexité Theta(n x S^2).
 
-    public static void aro(int[][] A, int[][] G, int k, int s){
+    private static void aro(int[][] A, int[][] G, int k, int s){
         if(k == 0) return;
         int aks = A[k][s];
         aro(A, G, k-1, s-aks);
         System.out.printf("Entrepot %d : stock livré = %d, gain = %d\n", k-1, aks, G[k-1][aks]);
     } // Complexité Theta(n).
 
-    public static int[][] estimate(Random rand, int n, int S){ // retourne G[0:n][0:H+1] de terme général
+    private static int[][] estimate(Random rand, int n, int S){ // retourne G[0:n][0:H+1] de terme général
         // G[i][h] = g(i,h). Les gains sont aléatoires, croissantes selon s.
         int[][] G = new int[n][S+1];
 
@@ -140,7 +140,7 @@ public class RSE {
         return G;
     }
 
-    public static int max(int x, int y){
+    private static int max(int x, int y){
         if (x>=y) return x;
         return y;
     }

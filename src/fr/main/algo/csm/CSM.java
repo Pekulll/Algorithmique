@@ -11,7 +11,7 @@ public class CSM {
         Utils.save("CSM", D);
     }
 
-    public static float[] run(int Lmax, int Nruns, int Vmax){
+    private static float[] run(int Lmax, int Nruns, int Vmax){
         Random rand = new Random();
         float[] D = new float[Nruns]; // Créer le tableau des distances relatives
 
@@ -42,7 +42,7 @@ public class CSM {
         return D;
     }
 
-    public static int[] createTriangle(Random rand, int m, int maxValue){
+    private static int[] createTriangle(Random rand, int m, int maxValue){
         int length = m * (m+1) / 2; // Calcul le nombre d'étages du triangle avec m niveau
         int[] T = new int[length];
 
@@ -53,13 +53,14 @@ public class CSM {
         return T; // Retourne le triangle généré aléatoirement
     }
 
-    public static int g(int i){
+    private static int g(int i){
         if(i == 0) return 1; // Si i = 0, le niveau associé est 0, donc le descendant gauche 1
 
-        // Niveau de l'indice i
+        // Niveau de l'indice i -- SOLUTION 1
         // Utilise une équation du second degré pour trouvé le niveau de l'indice i sans boucle
         // int level = (int)((Math.sqrt(1 + 8 * i) - 1) / 2);
 
+        // Niveau de l'indice i -- SOLUTION 2
         // Sans utiliser la méthode de calcul avec une équation du second degré
         // On obtient la valeur de l grâce à une boucle while
         int level = 1;
@@ -76,11 +77,11 @@ public class CSM {
         return left;
     }
 
-    public static int d(int i){
+    private static int d(int i){
         return g(i) + 1;
     }
 
-    public static int[] calculerM(int[] T){
+    private static int[] calculerM(int[] T){
         int[] M = new int[T.length]; // Initialise M[0:n]
 
         for(int i = T.length - 1; i >= 0; i--){
@@ -102,7 +103,7 @@ public class CSM {
         return y;
     }
 
-    public static void acsm(int[] M, int[] T, int i, int n){
+    private static void acsm(int[] M, int[] T, int i, int n){
         System.out.printf("T[%d] (M[%d]=%d) ----- %d ----> ", i, i, M[i], T[i]);
         int left = g(i);
 
@@ -113,7 +114,7 @@ public class CSM {
         else acsm(M, T, left + 1, n);
     }
 
-    public static int glouton(int[] T, int i){ // Appel principal : glouton(T, 0)
+    private static int glouton(int[] T, int i){ // Appel principal : glouton(T, 0)
         int g = T[i]; // Commence par prendre la première valeur T[i] (le début du chemin)
         int left = g(i); // Prend l'indice du descendant gauche de i
 

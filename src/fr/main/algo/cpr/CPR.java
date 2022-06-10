@@ -11,7 +11,7 @@ public class CPR {
         Utils.save("CPR", D);
     }
 
-    public static float[] run(int Lmax, int Cmax, int Nruns, int Vmax){
+    private static float[] run(int Lmax, int Cmax, int Nruns, int Vmax){
         Random rand = new Random();
         float[] D = new float[Nruns];
 
@@ -30,6 +30,8 @@ public class CPR {
 
             // Sélectionne le chemin otpimal allant de la case (0, 0) à la case (L - 1, C - 1)
             int v = M[L - 1][C - 1];
+
+            // Affiche le chemin et sa somme
             CPR.acpr(M, L - 1, C - 1, C, L, N, E, NE); // Affiche ce chemin
             System.out.println("Sum of the way: " + v); // Affiche la valeur de ce chemin
 
@@ -44,7 +46,7 @@ public class CPR {
         return D;
     }
 
-    public static int[][] createSquare(Random rand, int l, int c, int maxValue){
+    private static int[][] createSquare(Random rand, int l, int c, int maxValue){
         int[][] T = new int[l][c]; // Créer un rectangle de l x c
 
         for(int i = 0; i < l; i++){
@@ -55,7 +57,7 @@ public class CPR {
         return T;
     }
 
-    public static int[][] calculerM(int[][] N, int[][] E, int[][] NE){
+    private static int[][] calculerM(int[][] N, int[][] E, int[][] NE){
         int L = N.length, C = N[0].length;
         int[][] M = new int[N.length][N[0].length];
         M[0][0] = 0; // M(0, 0) = 0
@@ -105,7 +107,7 @@ public class CPR {
     }
 
     // Appel principal : acpr(M, S.length - 1, S[0].length - 1, S[0].length, S.length, S)
-    public static void acpr(int[][] M, int l, int c, int C, int L, int[][] N, int[][] E, int[][] NE){
+    private static void acpr(int[][] M, int l, int c, int C, int L, int[][] N, int[][] E, int[][] NE){
         if(l == 0 && c == 0) { System.out.print("0 "); return; }
 
         if(l==0){
@@ -138,7 +140,7 @@ public class CPR {
         }
     }
 
-    public static int glouton(int[][] N, int[][] E, int[][] NE, int l, int c){ // Appel principal : glouton(S, 0, 0)
+    private static int glouton(int[][] N, int[][] E, int[][] NE, int l, int c){ // Appel principal : glouton(S, 0, 0)
         int g = N[l][c]; // Commence par la case (x,y)
         int L = N.length, C = N[0].length;
 

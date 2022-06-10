@@ -11,7 +11,7 @@ public class RTT {
         Utils.save("RTT", D);
     }
 
-    public static float[] run(int Lmax, int Hmax, int Nruns){
+    private static float[] run(int Lmax, int Hmax, int Nruns){
         Random rand = new Random();
         float[] D = new float[Nruns];
 
@@ -29,7 +29,7 @@ public class RTT {
             int[][] M = MA[0], A = MA[1];
 
             // Affiche le chemin optimal
-            //RTT.aro(A, E, Lmax, Hmax);
+            aro(A, E, Lmax, Hmax);
 
             // Calcul la moyenne obtenue de façon gloutonne
             float g = glouton(E, E[0].length);
@@ -48,7 +48,7 @@ public class RTT {
         return D;
     }
 
-    public static float glouton(int[][] E, int Hmax) {
+    private static float glouton(int[][] E, int Hmax) {
         int remaining = Hmax, sum = 0;
         int[] hoursAllocated = new int[E.length];
 
@@ -79,7 +79,7 @@ public class RTT {
         return sum / (float)E.length;
     } // Theta (L * H)
 
-    public static int[][][] calculerMA(int[][] E){	// E : tableau des notes estimées.
+    private static int[][][] calculerMA(int[][] E){	// E : tableau des notes estimées.
         // E[0:n][0:H+1] est de terme général E[i][h] = e(i,h).
         // Retourne M et A : M[0:n+1][0:H+1] de terme général M[k][h] = m(k,h), somme maximum
         // des notes d'une répartition de h heures sur le sous-ensemble des k premières unités.
@@ -115,7 +115,7 @@ public class RTT {
         return new int[][][] {M, A};
     } // complexité Theta(L x H^2).
 
-    public static void aro(int[][] A, int[][] E, int k, int h){
+    private static void aro(int[][] A, int[][] E, int k, int h){
         // affiche ro(k,h) : répartition optimale de h heures sur les k premières unités.
         if (k == 0) return; // sans rien faire, ro(0,h) a été affichée.
         // ici : k > 0
@@ -131,7 +131,7 @@ public class RTT {
         // a été affichée.
     } // Complexité Theta(n).
 
-    public static int[][] estimate(int n, int H){ // retourne E[0:n][0:H+1] de terme général
+    private static int[][] estimate(int n, int H){ // retourne E[0:n][0:H+1] de terme général
         // E[i][h] = e(i,h). Les estimations sont aléatoires, croissantes selon h.
         int[][] E = new int[n][H+1];
         Random rand = new Random(); // pour génération aléatoire des notes estimées.
@@ -142,7 +142,7 @@ public class RTT {
         return E;
     }
 
-    public static int min(int x, int y){
+    private static int min(int x, int y){
         if (x<=y) return x;
         return y;
     }
