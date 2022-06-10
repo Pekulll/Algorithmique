@@ -50,26 +50,29 @@ public class RTT {
 
     public static float glouton(int[][] E, int Hmax) {
         int remaining = Hmax, sum = 0;
+        int[] hoursAllocated = new int[E.length];
 
         for(int l = 0; l < E.length; l++){
-            int max = 0, hoursNeeded = 0; // Récupère la note associé à 0 heure de travail
+            hoursAllocated[l] = 0;
+            sum += E[l][0];
+        }
 
-            if(remaining == 0){
-                max = E[l][0];
-            }else{
-                // Choisi la note maximale avec le nombre d'heure restant à disposition
-                for(int h = 1; h < E[l].length; h++){
-                    if(h > remaining) break;
+        while(remaining > 0){
+            int max = 0, allocatedTo = 0;
 
-                    if(max < E[l][h] - E[l][h - 1]){ // e(l, h) - e(l, h - 1)
-                        max = E[l][h] - E[l][h - 1]; // Nouveau gain maximum
-                        hoursNeeded = h;
-                    }
+            for(int l = 0; l < E.length; l++){
+                // Le nombre d'heure alloué à cette matière est maximum
+                if(hoursAllocated[l] + 1 >= E[l].length) continue;
+
+                if(max < E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]){ // e(l, h + 1) - e(l, h)
+                    max = E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]; // Nouveau gain maximum
+                    allocatedTo = l;
                 }
             }
 
-            sum += max; // Ajoute la note obtenu
-            remaining -= hoursNeeded; // Retranche les heures de travail utilisées
+            sum += max; // On ajoute le gain max
+            hoursAllocated[allocatedTo]++; // On ajoute 1 au nombre d'heures travaillées pour la matière qui correspond au gain max
+            remaining--; // On enlève 1 au nombre d'heures restant
         }
 
         System.out.println("Glouton average: " + (sum / (float)E.length) + "/20");
