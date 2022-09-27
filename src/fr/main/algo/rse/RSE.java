@@ -23,21 +23,6 @@ public class RSE {
             // Créer les gains aléatoirement pour chaque entrepôt en fonction du stock
             int[][] G = estimate(rand, E, S);
 
-            /* VALEURS DE TESTS
-            int[][] G = new int[][] // g(k,s) = gain obtenu d'une livraison
-                    // d'une quantité de stock s à l'entrepôt k
-                    {    { 0, 5, 5, 7, 7,10,10,12,12,13,13}, //
-                            { 0, 8,10,10,10,12,12,14,14,14,14},
-                            {0,10,10,12,12,13,13,14,15,16,16},
-                            {0,14,14,14,16,16,16,16,16,16,16},
-                            {0,10,14,14,14,14,14,14,14,16,16},
-                            {0,10,12,12,16,16,16,16,16,16,16},
-                            {0,12,12,14,14,15,15,15,17,17,17}
-                    } ;
-
-            int S = G[0].length - 1;
-            int E = G.length;*/
-
             // Calcul M et A en fonction de G
             int[][][] MA = calculerMA(G);
             int[][] M = MA[0], A = MA[1];
@@ -64,28 +49,30 @@ public class RSE {
 
     private static int glouton(int[][] G) {
         int remaining = G[0].length - 1, sum = 0;
-        int[] hoursAllocated = new int[G.length];
+        int[] stockAllocated = new int[G.length]; // Regroupe le nombre de stock alloué à chaque entrepôt
 
+        // base, le gain sans stock est la somme des gains sans stock de tous les entrepôts
         for(int e = 0; e < G.length; e++){
-            hoursAllocated[e] = 0;
+            stockAllocated[e] = 0;
             sum += G[e][0];
         }
 
+        // Tant qu'il reste du stock
         while(remaining > 0){
             int max = 0, allocatedTo = 0;
 
             for(int e = 0; e < G.length; e++){
                 // Le nombre de stock alloué à cet entrepôt est maximum
-                if(hoursAllocated[e] + 1 >= G[e].length) continue;
+                if(stockAllocated[e] + 1 >= G[e].length) continue;
 
-                if(max < G[e][hoursAllocated[e] + 1] - G[e][hoursAllocated[e]]){ // g(l, h + 1) - g(l, h)
-                    max = G[e][hoursAllocated[e] + 1] - G[e][hoursAllocated[e]]; // Nouveau gain maximum
+                if(max < G[e][stockAllocated[e] + 1] - G[e][stockAllocated[e]]){ // g(l, stockAllocated(l) + 1) - g(l, stockAllocated(l))
+                    max = G[e][stockAllocated[e] + 1] - G[e][stockAllocated[e]]; // Nouveau gain maximum, max=g(l, stockAllocated(l) + 1) - g(l, stockAllocated(l))
                     allocatedTo = e;
                 }
             }
 
             sum += max; // On ajoute le gain max
-            hoursAllocated[allocatedTo]++; // On ajoute 1 au stock envoyé à l'entrepôt qui correspond au gain max
+            stockAllocated[allocatedTo]++; // On ajoute 1 au stock envoyé à l'entrepôt qui correspond au gain max
             remaining--; // On enlève 1 au stock restant
         }
 
@@ -101,8 +88,12 @@ public class RSE {
         for (int i = 0; i < S + 1; i++)
             M[0][i] = 0;
 
+        for (int k = 0; k < n + 1; k++)
+            A[k][0] = 0;
+
+        // cas général, m(k,s)
         for (int k = 1; k < n+1; k++) {
-            for (int s = 0; s < S + 1; s++) {
+            for (int s = 1; s < S + 1; s++) {
                 M[k][s] = -999999;
                 for (int s_k = 0; s_k < s + 1; s_k++) {
                     int mkss_k = M[k - 1][s_k] + G[k - 1][s_k];

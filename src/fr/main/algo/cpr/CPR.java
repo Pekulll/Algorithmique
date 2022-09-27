@@ -85,16 +85,19 @@ public class CPR {
         return M;
     } // Theta(L x C)
 
+    // Retourne le coup d'un déplacement EST
     private static int E(int l, int c, int C, int L, int[][] S){
         if(c == C - 1) return 999999;
         return S[l][c+1];
     }
 
+    // Retourne le coup d'un déplacement NORD
     private static int N(int l, int c, int C, int L, int[][] S){
         if(l == L - 1) return 999999;
         return S[l + 1][c];
     }
 
+    // Retourne le coup d'un déplacement NORD-EST
     private static int NE(int l, int c, int C, int L, int[][] S){
         if(l == L-1 || c == C-1) return 999999;
         return S[l + 1][c + 1];

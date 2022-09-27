@@ -86,7 +86,11 @@ public class SSM {
         int c = C;
         int g = 0;
 
+        // Pour chaque objet dans l'odre décroissant de
+        // - leur ratio valeur/taille si la méthode est 'd'
+        // - leur valeur si la méthode est 'v'
         for(int index : indices){
+            // L'objet est trop gros pour rentrer dans le sac
             if(T[index] > c) continue;
 
             // l'objet rentre dans le sac
@@ -95,7 +99,7 @@ public class SSM {
         }
 
         System.out.printf("Glouton way: %d\n", g);
-        return g;
+        return g; // On retourne la valeur gloutonne
     } // Theta (n)
 
     private static int[] createSize(int n, int Tmax, Random rand){

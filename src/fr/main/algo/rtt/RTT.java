@@ -52,25 +52,27 @@ public class RTT {
         int remaining = Hmax, sum = 0;
         int[] hoursAllocated = new int[E.length];
 
+        // base, on ajoute la note minimal pour chaque matière
         for(int l = 0; l < E.length; l++){
             hoursAllocated[l] = 0;
             sum += E[l][0];
         }
 
+        // Tant qu'il reste du stock
         while(remaining > 0){
             int max = 0, allocatedTo = 0;
 
             for(int l = 0; l < E.length; l++){
-                // Le nombre d'heure alloué à cette matière est maximum
+                // Le nombre d'heures allouées à cette matière est maximum
                 if(hoursAllocated[l] + 1 >= E[l].length) continue;
 
-                if(max < E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]){ // e(l, h + 1) - e(l, h)
-                    max = E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]; // Nouveau gain maximum
-                    allocatedTo = l;
+                if(max < E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]){ // e(l, hoursAllocated(l) + 1) - e(l, hoursAllocated(l))
+                    max = E[l][hoursAllocated[l] + 1] - E[l][hoursAllocated[l]]; // Nouveau gain maximum, max = e(l, hoursAllocated(l) + 1) - e(l, hoursAllocated(l))
+                    allocatedTo = l; // On enregistre l'entrepôt où le gain est maximum
                 }
             }
 
-            sum += max; // On ajoute le gain max
+            sum += max; // On ajoute le gain max, sum += e(allocatedTo, hoursAllocated(l) + 1) - e(allocatedTo, hoursAllocated(l))
             hoursAllocated[allocatedTo]++; // On ajoute 1 au nombre d'heures travaillées pour la matière qui correspond au gain max
             remaining--; // On enlève 1 au nombre d'heures restant
         }

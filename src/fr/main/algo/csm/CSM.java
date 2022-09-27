@@ -81,16 +81,20 @@ public class CSM {
         return g(i) + 1;
     }
 
+    // Appel principal : calculerM(T)
     private static int[] calculerM(int[] T){
         int[] M = new int[T.length]; // Initialise M[0:n]
 
         for(int i = T.length - 1; i >= 0; i--){
             int left = g(i);
 
-            if(left >= T.length){ // Base : le niveau de i est le dernier niveau
+            // Base : le niveau de i est le dernier niveau
+            // i n'a donc aucun descendant
+            if(left >= T.length){
                 M[i] = T[i]; // m(i) = T[i]
-            }else{
-                // Cas général : m(i) = max { m(g(i)), m(g(i) + 1) } + T[i]
+            }
+            // Cas général : m(i) = max { m(g(i)), m(d(i)) } + T[i]
+            else{
                 M[i] = max(M[left], M[left + 1]) + T[i];
             }
         }
@@ -103,6 +107,7 @@ public class CSM {
         return y;
     }
 
+    // Appel principal : acpr(M, T, 0, T.length)
     private static void acsm(int[] M, int[] T, int i, int n){
         System.out.printf("T[%d] (M[%d]=%d) ----- %d ----> ", i, i, M[i], T[i]);
         int left = g(i);
@@ -114,14 +119,18 @@ public class CSM {
         else acsm(M, T, left + 1, n);
     }
 
-    private static int glouton(int[] T, int i){ // Appel principal : glouton(T, 0)
+    // Appel principal : glouton(T, 0)
+    private static int glouton(int[] T, int i){
         int g = T[i]; // Commence par prendre la première valeur T[i] (le début du chemin)
         int left = g(i); // Prend l'indice du descendant gauche de i
 
         while(left < T.length){ // Continue tant qu'on est pas en bas du triangle
+            // T(g(i)) > T(d(i))
             if(T[left] > T[left + 1]){ // Regarde la case de valeur maximale entre le descendant gauche et le droit
                 i = left; // Le descendant gauche est plus grand
-            }else{ // Le descendant droit est plus grand
+            }
+            // T(g(i)) <= T(d(i))
+            else{ // Le descendant droit est plus grand
                 i = left + 1;
             }
 
